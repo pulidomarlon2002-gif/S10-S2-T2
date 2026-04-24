@@ -1,69 +1,48 @@
- const API = "http://localhost:3000/productos";
+const express = require('express');
+const cors = require('cors');
+const { Sequelize, DataTypes } = require('sequelize');
 
-const nombre = document.getElementById("nombre");
-const precio = document.getElementById("precio");
-const stock = document.getElementById("stock");
-const tabla = document.getElementById("tablaProductos");
-const btnGuardar = document.getElementById("btnGuardar");
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-async function cargarProductos() {
-    const res = await fetch(API);
-    const data = await res.json();
-
-    tabla.innerHTML = "";
-    data.forEach(p => {
-        tabla.innerHTML += `
-            <tr>
-                <td>${p.id}</td>
-                <td>${p.nombre}</td>
-                <td>${p.precio}</td>
-                <td>${p.stock}</td>
-                <td>
-                    <button class="btn-edit" onclick="editarProducto(${p.id})">Editar</button>
-                    <button class="btn-delete" onclick="eliminarProducto(${p.id})">Eliminar</button>
-                </td>
-            </tr>
-        `;
-    });
-}
-
-btnGuardar.addEventListener("click", async () => {
-    const nuevo = {
-        nombre: nombre.value,
-        precio: precio.value,
-        stock: stock.value
-    };
-
-    await fetch(API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevo)
-    });
-
-    cargarProductos();
+// 1. Base de datos SQLite
+const sequelize = new Sequelize({ 
+    dialect: 'sqlite', 
+    storage: './database.sqlite' 
 });
 
-async function eliminarProducto(id) {
-    await fetch(`${API}/${id}`, { method: "DELETE" });
-    cargarProductos();
-}
+// 2. Definición del Modelo
+const Producto = sequelize.define('Producto', {
+    nombre: DataTypes.STRING,
+    precio: DataTypes.FLOAT,
+    stock: DataTypes.INTEGER
+});
 
-async function editarProducto(id) {
-    const nuevoNombre = prompt("Nuevo nombre:");
-    const nuevoPrecio = prompt("Nuevo precio:");
-    const nuevoStock = prompt("Nuevo stock:");
+// 3. Rutas de la API
+app.get('/productos', async (req, res) => {
+    const productos = await Producto.findAll();
+    res.json(productos);
+});
 
-    await fetch(`${API}/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            nombre: nuevoNombre,
-            precio: nuevoPrecio,
-            stock: nuevoStock
-        })
+app.post('/productos', async (req, res) => {
+    const nuevo = await Producto.create(req.body);
+    res.json(nuevo);
+});
+
+app.delete('/productos/:id', async (req, res) => {
+    await Producto.destroy({ where: { id: req.params.id } });
+    res.json({ mensaje: "Eliminado" });
+});
+
+app.put('/productos/:id', async (req, res) => {
+    await Producto.update(req.body, { where: { id: req.params.id } });
+    res.json({ mensaje: "Actualizado" });
+});
+
+// 4. Sincronización e Inicio (Corregido a puerto 3000)
+sequelize.sync().then(() => {
+    app.listen(3000, () => {
+        console.log('✅ Servidor de Inventario funcionando en: http://localhost:3000');
     });
-
-    cargarProductos();
-}
-
-cargarProductos();
+});
