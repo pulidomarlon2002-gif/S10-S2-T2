@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Inventario</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header class="header">
+        <img src="https://cdn-icons-png.flaticon.com/512/679/679922.png" class="icon">
+        <h1>Sistema de Inventario</h1>
+        <p>Gestiona tus productos de manera fácil y rápida</p>
+    </header>
+
+    <section class="card">
+        <h2>Nuevo Producto</h2>
+
+        <div class="form-grid">
+            <div>
+                <label>Nombre del producto</label>
+                <input id="nombre" type="text" placeholder="Ej: Laptop Lenovo">
+            </div>
+
+            <div>
+                <label>Precio (S/.)</label>
+                <input id="precio" type="number" placeholder="Ej: 2500">
+            </div>
+
+            <div>
+                <label>Stock</label>
+                <input id="stock" type="number" placeholder="10">
+            </div>
+
+            <button id="btnGuardar" class="btn-success">Guardar Producto</button>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Lista de Productos</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio (S/.)</th>
+                    <th>Stock</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tablaProductos"></tbody>
+        </table>
+    </section>
+
+    <footer class="footer">
+        © 2024 Sistema de Inventario - Node.js + Express + SQLite
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
